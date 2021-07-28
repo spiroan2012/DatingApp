@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { NgxSpinnerService } from 'ngx-spinner';
-import { threadId } from 'worker_threads';
 
 @Injectable({
   providedIn: 'root'
