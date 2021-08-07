@@ -16,8 +16,6 @@ using System.Threading.Tasks;
 namespace API.Controllers
 {
 	[Authorize]
-	[Route("api/[controller]")]
-	[ApiController]
 	public class UsersController : BaseApiController
 	{
 		//private readonly DataContext _context;

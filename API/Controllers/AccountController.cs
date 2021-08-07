@@ -10,8 +10,6 @@ using System.Threading.Tasks;
 
 namespace API.Controllers
 {
-	[Route("api/[controller]")]
-	[ApiController]
 	public class AccountController : BaseApiController
 	{
 		private readonly DataContext _context;
