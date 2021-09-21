@@ -69,20 +69,19 @@ namespace API.Data
 		public async Task<PagedList<MessageDto>> GetMessagesForUser(MessageParams messageParams)
 		{
 			var query = _context.Messages
+				.ProjectTo<MessageDto>(_mapper.ConfigurationProvider)
 				.OrderByDescending(m => m.MessageSent)
 				.AsQueryable();
 
 			query = messageParams.Container switch
 			{
-				"Inbox" => query.Where(u => u.Recipient.UserName == messageParams.Username && u.RecipientDeleted == false),
-				"Outbox" => query.Where(u => u.Sender.UserName == messageParams.Username && u.SenderDeleted == false),
-				_ => query.Where(u => u.Recipient.UserName == 
+				"Inbox" => query.Where(u => u.RecipientUsername == messageParams.Username && u.RecipientDeleted == false),
+				"Outbox" => query.Where(u => u.SenderUsername == messageParams.Username && u.SenderDeleted == false),
+				_ => query.Where(u => u.RecipientUsername == 
 					messageParams.Username && u.RecipientDeleted == false && u.DateRead == null)
 			};
 
-			var messages = query.ProjectTo<MessageDto>(_mapper.ConfigurationProvider);
-
-			return await PagedList<MessageDto>.CreateAsync(messages, messageParams.PageNumber, messageParams.PageSize); 
+			return await PagedList<MessageDto>.CreateAsync(query, messageParams.PageNumber, messageParams.PageSize); 
 		}
 
 		public async Task<IEnumerable<MessageDto>> GetMessageThread(string currentUsername, string recipientUsername)
@@ -96,10 +95,11 @@ namespace API.Data
 						&& m.Sender.UserName == currentUsername && m.SenderDeleted == false
 					)
 				.OrderBy(m => m.MessageSent)
+				.ProjectTo<MessageDto>(_mapper.ConfigurationProvider)
 				.ToListAsync();
 
 			var unreadMessages = messages.Where(m => m.DateRead == null
-				&& m.Recipient.UserName == currentUsername)
+				&& m.RecipientUsername == currentUsername)
 				.ToList();
 
 			if (unreadMessages.Any())
@@ -108,11 +108,9 @@ namespace API.Data
 				{
 					message.DateRead = DateTime.Now;
 				}
-
-				await _context.SaveChangesAsync();
 			}
 
-			return _mapper.Map<IEnumerable<MessageDto>>(messages);
+			return messages;
 		}
 
 		public void RemoveConnection(Connection connection)
@@ -120,9 +118,9 @@ namespace API.Data
 			_context.Connections.Remove(connection);
 		}
 
-		public async Task<bool> SaveAllASync()
-		{
-			return await _context.SaveChangesAsync() > 0;
-		}
+		//public async Task<bool> SaveAllASync()
+		//{
+		//	return await _context.SaveChangesAsync() > 0;
+		//}
 	}
 }

@@ -20,9 +20,10 @@ namespace API.Extensions
 		{
 			services.AddScoped<IPhotoService,PhotoService>();
 			services.Configure<CloudinarySettings>(config.GetSection("CloudinarySettings"));
-			services.AddScoped<IUserRepository, UserRepository>();
-			services.AddScoped<ILikesRepository, LikesRepository>();
-			services.AddScoped<IMessageRepository, MessageRepository>();
+			//services.AddScoped<IUserRepository, UserRepository>();
+			//services.AddScoped<ILikesRepository, LikesRepository>();
+			//services.AddScoped<IMessageRepository, MessageRepository>();
+			services.AddScoped<IUnitOfWork, UnitOfWork>();
 			services.AddScoped<ITokenService, TokenService>();
 			services.AddScoped<LogUserActivity>();
 			services.AddSingleton<PresenceTracker>();
